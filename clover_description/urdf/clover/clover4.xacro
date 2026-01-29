@@ -10,13 +10,17 @@
 
   <xacro:include filename="clover4_base.xacro" />
   <xacro:include filename="../sensors/rpi_cam.urdf.xacro"/>
+  <xacro:include filename="../sensors/depth_cam.xacro"/>
   <xacro:include filename="../sensors/distance_sensor.urdf.xacro"/>
   <xacro:include filename="../leds/led_strip.xacro"/>
 
   <!-- Create camera plugin -->
   <xacro:if value="$(arg main_camera)">
     <xacro:rpi_cam name="main_camera" parent="base_link" x="0.055" y="0.0" z="-0.03" roll="0" pitch="${pi / 2}" yaw="0" width="320" height="240" rate="40" do_throttling="$(arg maintain_camera_rate)"/>
-  </xacro:if>
+  </xacro:if> 
+  
+  <!-- Create depth camera plugin   -->
+  <xacro:depth_cam name="depth_camera" parent="base_link" x="0.055" y="0.0" z="-0.03" roll="0" pitch="${pi / 2}" yaw="0" width="320" height="240" rate="40"/>
 
   <!-- Create rangefinder plugin -->
   <xacro:if value="$(arg rangefinder)">
