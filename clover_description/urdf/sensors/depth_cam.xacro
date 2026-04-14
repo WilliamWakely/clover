@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <robot name="depth_camera" xmlns:xacro="http://ros.org/wiki/xacro">
-  <xacro:include filename="../depth_sensor.urdf.xacro"/>
-
-  <xacro:macro name="depth_cam"
-               params="name:=depth_cam parent x:=0 y:=0 z:=0 roll:=0 pitch:=0 yaw:=0 width:=320 height:=240 rate:=40">
+    <xacro:macro name="depth_cam"
+               params="name:=depth_cam parent x:=0 y:=0 z:=0 roll:=0 pitch:=0 yaw:=0">
 
     <joint name="${name}_joint" type="fixed">
       <origin xyz="${x} ${y} ${z}" rpy="${roll} ${pitch} ${yaw}"/>
@@ -31,46 +29,121 @@
         <origin xyz="0 0 0"/>
         <inertia ixx="4.15e-6" iyy="2.407e-6" izz="2.407e-6" ixy="0" ixz="0" iyz="0"/>
       </inertial>
+    
+      <sensor name="cameradepth" type="depth">
+        <camera name="camera">
+          <horizontal_fov>1.57</horizontal_fov>
+          <image>
+            <width>1280</width>
+            <height>720</height>
+          </image>
+          <clip>
+            <near>0.1</near>
+            <far>100</far>
+          </clip>
+          <noise>
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>0.100</stddev>
+          </noise>
+        </camera>
+        <always_on>1</always_on>
+        <update_rate>30</update_rate>
+        <visualize>0</visualize>
+      </sensor>
+      <sensor name="cameracolor" type="camera">
+        <camera name="camera">
+          <horizontal_fov>1.57</horizontal_fov>
+          <image>
+            <width>1280</width>
+            <height>720</height>
+            <format>RGB_INT8</format>
+          </image>
+          <clip>
+            <near>0.1</near>
+            <far>100</far>
+          </clip>
+          <noise>
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>0.007</stddev>
+          </noise>
+        </camera>
+        <always_on>1</always_on>
+        <update_rate>30</update_rate>
+        <visualize>1</visualize>
+      </sensor>
+      <sensor name="cameraired1" type="camera">
+        <camera name="camera">
+          <horizontal_fov>1.57</horizontal_fov>
+          <image>
+            <width>1280</width>
+            <height>720</height>
+            <format>L_INT8</format>
+          </image>
+          <clip>
+            <near>0.1</near>
+            <far>100</far>
+          </clip>
+          <noise>
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>0.05</stddev>
+          </noise>
+        </camera>
+        <always_on>1</always_on>
+        <update_rate>1</update_rate>
+        <visualize>0</visualize>
+      </sensor>
+      <sensor name="cameraired2" type="camera">
+        <camera name="camera">
+          <horizontal_fov>1.57</horizontal_fov>
+          <image>
+            <width>1280</width>
+            <height>720</height>
+            <format>L_INT8</format>
+          </image>
+          <clip>
+            <near>0.1</near>
+            <far>100</far>
+          </clip>
+          <noise>
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>0.05</stddev>
+          </noise>
+        </camera>
+        <always_on>1</always_on>
+        <update_rate>1</update_rate>
+        <visualize>0</visualize>
+      </sensor>
     </link>
 
     <!-- IMPORTANT: reference the LINK, not the joint -->
     <gazebo reference="${name}_link">
-      <disableFixedJointLumping>true</disableFixedJointLumping>
-      <preserveFixedJoint>true</preserveFixedJoint>
-
-      <sensor type="depth" name="${name}">
-        <always_on>true</always_on>
-        <update_rate>${rate}</update_rate>
-        <visualize>true</visualize>
-
-        <camera>
-          <horizontal_fov>${120 * pi / 180}</horizontal_fov>
-          <image>
-            <format>R8G8B8</format>
-            <width>${width}</width>
-            <height>${height}</height>
-          </image>
-          <clip>
-            <near>0.02</near>
-            <far>1000</far>
-          </clip>
-        </camera>
-
-        <plugin name="${name}_depth" filename="libgazebo_ros_depth_camera.so">
-          <alwaysOn>true</alwaysOn>
-          <updateRate>${rate}</updateRate>
-
-          <cameraName>${name}</cameraName>
-          <frameName>main_camera_optical</frameName>
-
-          <!-- Depth -->
-          <depthImageTopicName>depth/image_raw</depthImageTopicName>
-          <depthImageInfoTopicName>depth/camera_info</depthImageInfoTopicName>
-
-          <!-- PointCloud -->
-          <pointCloudTopicName>depth/points</pointCloudTopicName>
-        </plugin>
-      </sensor>
+      <plugin name="camera" filename="librealsense_gazebo_plugin.so">
+        <prefix>camera</prefix>
+        <depthUpdateRate>30.0</depthUpdateRate>
+        <colorUpdateRate>30.0</colorUpdateRate>
+        <infraredUpdateRate>1.0</infraredUpdateRate>
+        <depthTopicName>aligned_depth_to_color/image_raw</depthTopicName>
+        <depthCameraInfoTopicName>depth/camera_info</depthCameraInfoTopicName>
+        <colorTopicName>color/image_raw</colorTopicName>
+        <colorCameraInfoTopicName>color/camera_info</colorCameraInfoTopicName>
+        <infrared1TopicName>infra1/image_raw</infrared1TopicName>
+        <infrared1CameraInfoTopicName>infra1/camera_info</infrared1CameraInfoTopicName>
+        <infrared2TopicName>infra2/image_raw</infrared2TopicName>
+        <infrared2CameraInfoTopicName>infra2/camera_info</infrared2CameraInfoTopicName>
+        <colorOpticalframeName>camera_color_optical_frame</colorOpticalframeName>
+        <depthOpticalframeName>camera_depth_optical_frame</depthOpticalframeName>
+        <infrared1OpticalframeName>camera_left_ir_optical_frame</infrared1OpticalframeName>
+        <infrared2OpticalframeName>camera_right_ir_optical_frame</infrared2OpticalframeName>
+        <rangeMinDepth>0.3</rangeMinDepth>
+        <rangeMaxDepth>3.0</rangeMaxDepth>
+        <pointCloud>true</pointCloud>
+        <pointCloudTopicName>depth/color/points</pointCloudTopicName>
+        <pointCloudCutoff>0.3</pointCloudCutoff>
+      </plugin>
     </gazebo>
 
   </xacro:macro>

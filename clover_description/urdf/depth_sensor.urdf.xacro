@@ -1,74 +1,125 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <robot name="depth_sensor" xmlns:xacro="http://ros.org/wiki/xacro">
-  <xacro:macro name="camera_sensor_base"
-      params="name width height rate horizontal_fov frame_name k1 k2 k3 p1 p2 cx cy cx_prime ros_plugin_name min_rate window_size max_st_dev">
+  <xacro:macro name="camera_sensor_base">
     <gazebo reference="${name}_link">
-      <sensor type="depth" name="${name}">
-        <camera>
-          <horizontal_fov>${horizontal_fov}</horizontal_fov>
+      <sensor name="cameradepth" type="depth">
+        <camera name="camera">
+          <horizontal_fov>1.57</horizontal_fov>
           <image>
-            <format>B8G8R8</format>
-            <width>${width}</width>
-            <height>${height}</height>
+            <width>1280</width>
+            <height>720</height>
           </image>
           <clip>
-            <near>0.02</near>
-            <far>1000</far>
+            <near>0.1</near>
+            <far>100</far>
           </clip>
+          <noise>
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>0.100</stddev>
+          </noise>
         </camera>
         <always_on>1</always_on>
-        <update_rate>${rate}</update_rate>
-        <visualize>true</visualize>
-        <plugin name="depth_camera_plugin" filename="${ros_plugin_name}">
-          <alwaysOn>true</alwaysOn>
-	  <updateRate>${rate}</updateRate>
-
-	  <cameraName>${name}</cameraName>
-	  <frameName>${frame_name}</frameName>
-
-	  <!-- RGB 
-	  <imageTopicName>image_raw</imageTopicName>
-	  <cameraInfoTopicName>camera_info</cameraInfoTopicName>
-	  -->
-	  
-	  <!-- Depth -->
-	  <depthImageTopicName>depth/image_raw</depthImageTopicName>
-	  <depthImageInfoTopicName>depth/camera_info</depthImageInfoTopicName>
-
-	  <!-- Optional PointCloud -->
-	  <pointCloudTopicName>depth/points</pointCloudTopicName>
-	</plugin>
+        <update_rate>30</update_rate>
+        <visualize>0</visualize>
       </sensor>
+      <sensor name="cameracolor" type="camera">
+        <camera name="camera">
+          <horizontal_fov>1.57</horizontal_fov>
+          <image>
+            <width>1280</width>
+            <height>720</height>
+            <format>RGB_INT8</format>
+          </image>
+          <clip>
+            <near>0.1</near>
+            <far>100</far>
+          </clip>
+          <noise>
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>0.007</stddev>
+          </noise>
+        </camera>
+        <always_on>1</always_on>
+        <update_rate>30</update_rate>
+        <visualize>1</visualize>
+      </sensor>
+      <sensor name="cameraired1" type="camera">
+        <camera name="camera">
+          <horizontal_fov>1.57</horizontal_fov>
+          <image>
+            <width>1280</width>
+            <height>720</height>
+            <format>L_INT8</format>
+          </image>
+          <clip>
+            <near>0.1</near>
+            <far>100</far>
+          </clip>
+          <noise>
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>0.05</stddev>
+          </noise>
+        </camera>
+        <always_on>1</always_on>
+        <update_rate>1</update_rate>
+        <visualize>0</visualize>
+      </sensor>
+      <sensor name="cameraired2" type="camera">
+        <camera name="camera">
+          <horizontal_fov>1.57</horizontal_fov>
+          <image>
+            <width>1280</width>
+            <height>720</height>
+            <format>L_INT8</format>
+          </image>
+          <clip>
+            <near>0.1</near>
+            <far>100</far>
+          </clip>
+          <noise>
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>0.05</stddev>
+          </noise>
+        </camera>
+        <always_on>1</always_on>
+        <update_rate>1</update_rate>
+        <visualize>0</visualize>
+      </sensor>
+    </gazebo>
+
+    <gazebo>
+      <plugin name="camera" filename="librealsense_gazebo_plugin.so">
+        <prefix>camera</prefix>
+        <depthUpdateRate>30.0</depthUpdateRate>
+        <colorUpdateRate>30.0</colorUpdateRate>
+        <infraredUpdateRate>1.0</infraredUpdateRate>
+        <depthTopicName>aligned_depth_to_color/image_raw</depthTopicName>
+        <depthCameraInfoTopicName>depth/camera_info</depthCameraInfoTopicName>
+        <colorTopicName>color/image_raw</colorTopicName>
+        <colorCameraInfoTopicName>color/camera_info</colorCameraInfoTopicName>
+        <infrared1TopicName>infra1/image_raw</infrared1TopicName>
+        <infrared1CameraInfoTopicName>infra1/camera_info</infrared1CameraInfoTopicName>
+        <infrared2TopicName>infra2/image_raw</infrared2TopicName>
+        <infrared2CameraInfoTopicName>infra2/camera_info</infrared2CameraInfoTopicName>
+        <colorOpticalframeName>camera_color_optical_frame</colorOpticalframeName>
+        <depthOpticalframeName>camera_depth_optical_frame</depthOpticalframeName>
+        <infrared1OpticalframeName>camera_left_ir_optical_frame</infrared1OpticalframeName>
+        <infrared2OpticalframeName>camera_right_ir_optical_frame</infrared2OpticalframeName>
+        <rangeMinDepth>0.3</rangeMinDepth>
+        <rangeMaxDepth>3.0</rangeMaxDepth>
+        <pointCloud>true</pointCloud>
+        <pointCloudTopicName>depth/color/points</pointCloudTopicName>
+        <pointCloudCutoff>0.3</pointCloudCutoff>
+      </plugin>
     </gazebo>
   </xacro:macro>
 
-  <xacro:macro name="depth_sensor" params="name width height rate horizontal_fov k1:=0 k2:=0 k3:=0 p1:=0 p2:=0 do_throttling:=false">
-    <xacro:if value="${do_throttling}">
-      <xacro:property name="ros_plugin_name" value="libthrottling_camera.so"/>
-    </xacro:if>
-    <xacro:unless value="${do_throttling}">
-      <xacro:property name="ros_plugin_name" value="libgazebo_ros_depth_camera.so"/>
-    </xacro:unless>
+  <xacro:macro name="depth_sensor" params="name">
     <xacro:camera_sensor_base
-      name="${name}"
-      width="${width}"
-      height="${height}"
-      rate="${rate}"
-      horizontal_fov="${horizontal_fov}"
-      frame_name="/${name}_optical"
-      k1="${k1}"
-      k2="${k2}"
-      k3="${k3}"
-      p1="${p1}"
-      p2="${p2}"
-      cx="${(width + 1.0)/2.0}"
-      cy="${(height + 1.0)/2.0}"
-      cx_prime="${(width + 1.0)/2.0}"
-      ros_plugin_name="${ros_plugin_name}"
-      min_rate="${rate * 0.95}"
-      window_size="${rate}"
-      max_st_dev="${3.0 / rate}"
-    />
-
+      name="${name}"/>
   </xacro:macro>
 </robot>

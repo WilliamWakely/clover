@@ -10,7 +10,10 @@
 
   <xacro:include filename="clover4_base.xacro" />
   <xacro:include filename="../sensors/rpi_cam.urdf.xacro"/>
-  <xacro:include filename="../sensors/depth_cam.xacro"/>
+
+  <xacro:include filename="../sensors/_d435i.urdf.xacro"/>
+  <xacro:include filename="../_d435.gazebo.xacro" />
+
   <xacro:include filename="../sensors/distance_sensor.urdf.xacro"/>
   <xacro:include filename="../leds/led_strip.xacro"/>
 
@@ -20,7 +23,21 @@
   </xacro:if> 
   
   <!-- Create depth camera plugin   -->
-  <xacro:depth_cam name="depth_camera" parent="base_link" x="0.055" y="0.0" z="-0.03" roll="0" pitch="${pi / 2}" yaw="0" width="320" height="240" rate="40"/>
+  <xacro:sensor_d435i parent="base_link" name="camera" use_nominal_extrinsics="true">
+    <origin xyz="0.0 0.0 -0.06" rpy="0 ${pi/2} 0"/>
+  </xacro:sensor_d435i>
+
+  <xacro:gazebo_d435
+      camera_name="camera"
+      reference_link="camera_link"
+      topics_ns="camera"
+      depth_optical_frame="camera_depth_optical_frame"
+      color_optical_frame="camera_color_optical_frame"
+      infrared1_optical_frame="camera_infra1_optical_frame"
+      infrared2_optical_frame="camera_infra2_optical_frame"
+      publish_pointcloud="true" />
+
+  <!-- <xacro:depth_cam name="depth_camera" parent="base_link" x="0.055" y="0.0" z="-0.03" roll="0" pitch="${pi / 2}" yaw="0"/> -->
 
   <!-- Create rangefinder plugin -->
   <xacro:if value="$(arg rangefinder)">
