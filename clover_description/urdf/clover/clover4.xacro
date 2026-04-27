@@ -25,7 +25,7 @@
   <!-- Create depth camera plugin   -->
   <xacro:if value="$(arg depth_camera)">
     <xacro:sensor_d435i parent="base_link" name="camera" use_nominal_extrinsics="true">
-      <origin xyz="0.0 -0.0125 -0.06" rpy="0 ${pi/2} ${pi/2}"/>
+      <origin xyz="0.0 0.0125 -0.06" rpy="0 ${pi/2} ${-pi/2}"/>
     </xacro:sensor_d435i>
   </xacro:if> 
 
