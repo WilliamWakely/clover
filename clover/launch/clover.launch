@@ -58,6 +58,10 @@
     <include file="$(find clover)/launch/main_camera.launch" if="$(arg main_camera)">
         <arg name="simulator" value="$(arg simulator)"/>
     </include>
+    
+    <!-- Realsense camera -->
+    <include file="$(find realsense2_camera)/launch/rs_camera.launch">
+    </include>
 
     <!-- rosbridge -->
     <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" if="$(eval rosbridge or rc)"/>
