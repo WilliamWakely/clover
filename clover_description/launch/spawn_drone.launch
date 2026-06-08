@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
+    <!-- Gazebo Params -->
+    <arg name="x" default="-1.5"/>
+    <arg name="y" default="0.0"/>
+    <arg name="z" default="0.4"/>
+    <arg name="yaw" default="0.0"/>
     <!-- Toggleable model parameters -->
     <!-- Main camera -->
     <arg name="main_camera" default="true"/>
@@ -16,5 +21,5 @@
     <arg name="cmd" default="$(find xacro)/xacro $(find clover_description)/urdf/clover/clover4.xacro main_camera:=$(arg main_camera) depth_camera:=$(arg depth_camera) rangefinder:=$(arg rangefinder) led:=$(arg led) gps:=$(arg gps) maintain_camera_rate:=$(arg maintain_camera_rate) use_clover_physics:=$(arg use_clover_physics)"/>
     <param command="$(arg cmd)" name="drone_description"/>
     <!-- Note: -package_to_model replaces all mentions of "package://" with "model://" in urdf URIs -->
-    <node name="$(anon spawn)" output="screen" pkg="gazebo_ros" type="spawn_model" args="-urdf -param drone_description -model clover -x -1.5 -z 0.3"/> 
+    <node name="$(anon spawn)" output="screen" pkg="gazebo_ros" type="spawn_model" args="-urdf -param drone_description -model clover -x $(arg x) -y $(arg y) -z $(arg z)"/> 
 </launch>

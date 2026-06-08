@@ -60,8 +60,8 @@
     </include>
     
     <!-- Realsense camera -->
-    <include file="$(find realsense2_camera)/launch/rs_camera.launch">
-    </include>
+    <!-- <include file="$(find realsense2_camera)/launch/rs_camera.launch">
+    </include> -->
 
     <!-- rosbridge -->
     <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" if="$(eval rosbridge or rc)"/>
