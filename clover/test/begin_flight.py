@@ -1,8 +1,6 @@
 #! /usr/bin/env python3
 
 import threading
-import numpy as np
-
 import rospy
 from geometry_msgs.msg import PoseStamped
 from mavros_msgs.msg import State
@@ -23,16 +21,19 @@ setpoint_lock = threading.Lock()
 def state_cb(msg):
     global current_state
     current_state = msg
+# End of CallBack
 
 def setpoint_cb(msg):
     global setpoint_pose
     with setpoint_lock:
         setpoint_pose = msg
+# End of CallBack
 
 def dronePose_cb(msg):
     global current_pose
     with home_lock:
         current_pose = msg
+# End of CallBack
 
 def offboard_control_cb(req):
     global offboard_control_enabled
@@ -50,6 +51,7 @@ def offboard_control_cb(req):
         success=True,
         message=f"offboard_control_enabled={offboard_control_enabled}"
     )
+# End of CallBack
 
 def set_home():
     global home_pose
@@ -68,6 +70,7 @@ def set_home():
         home_pose.pose.position.y,
         home_pose.pose.position.z,
     )
+# End of Function
 
 def begin_flight():
     alt_flag = False
@@ -91,10 +94,14 @@ def begin_flight():
 
     arm_cmd = CommandBoolRequest()
     arm_cmd.value = True
+    
+    was_armed = False
 
     last_req = rospy.Time.now()
-
     while not rospy.is_shutdown():
+
+        if current_state.armed:
+            was_armed = True
 
         # Only force OFFBOARD while this node owns mode control.
         if offboard_control_enabled:
@@ -133,7 +140,13 @@ def begin_flight():
             if setpoint_pose is not None:
                 local_pos_pub.publish(setpoint_pose)
 
+        # Exit only after the vehicle has flown and subsequently disarmed.
+        if was_armed and not current_state.armed:
+            rospy.loginfo("Vehicle landed/disarmed, exiting flight loop")
+            break
+
         rate.sleep()
+# End of Function
 
 if __name__ == "__main__":
     rospy.init_node("offb_node_py")
