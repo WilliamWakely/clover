@@ -59,9 +59,17 @@
         <arg name="simulator" value="$(arg simulator)"/>
     </include>
     
-    <!-- Realsense camera -->
+    <!-- RealSense camera -->
     <!-- <include file="$(find realsense2_camera)/launch/rs_camera.launch">
-        <arg name="depth_fps" value="5"/>
+        <arg name="depth_width" value="848"/>
+        <arg name="depth_height" value="480"/>
+        <arg name="depth_fps" value="6"/>
+
+        <arg name="enable_depth" value="true"/>
+        <arg name="enable_color" value="false"/>
+        <arg name="enable_infra1" value="false"/>
+        <arg name="enable_infra2" value="false"/>
+        <arg name="enable_pointcloud" value="false"/>
     </include> -->
 
     <!-- rosbridge -->
